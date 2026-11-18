@@ -1,0 +1,14 @@
+# Real-Time Wi-Fi Analyzer Dependencies
+# Install with: pip install -r requirements.txt
+
+# GUI Framework: Native desktop graphical user interface bindings
+PyQt5>=5.15.9
+
+# High-Performance Real-Time 2D Plotting (antialiased, 60fps graph updates)
+pyqtgraph>=0.13.3
+
+# System and Network Interface Monitoring (real-time bytes sent/received I/O counters)
+psutil>=5.9.5
+
+# High-performance numerical arrays for time-series graph buffering
+numpy>=1.24.0
