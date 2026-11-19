@@ -1,45 +1,46 @@
-# Real-Time Wi-Fi Analyzer 📡
+# Real-Time Wi-Fi Suite 📡⚡
 
-A native desktop application built with **Python**, **PyQt5**, and **PyQtGraph** for real-time monitoring, throughput analysis, latency tracking, and signal strength (RSSI) diagnostics of your Wi-Fi connection.
+A native desktop application built with **Python**, **PyQt5**, and **PyQtGraph** for real-time Wi-Fi network analysis and active speed limit saturation benchmarking.
+
+The software features a **Mode Selection Window** that allows users to choose between two specialized operating modes:
+1. **Window 1: Real-Time Wi-Fi Analyzer** — Continuous 1Hz passive monitoring of throughput and router ping latency.
+2. **Window 2: Speed Limit Test** — 20-second active multi-threaded saturation benchmark to measure peak achievable bandwidth (Download first, then Upload).
 
 ---
 
-## 🌟 Key Features
+## 🌟 Modes Overview
 
-1. **Wi-Fi Connection Enforcement**
-   - The analyzer **can only be run when your laptop is connected to Wi-Fi**.
-   - If Wi-Fi is disconnected, the **Run Analyzer** button is automatically disabled and locked, and a status banner prompts you to connect to a Wi-Fi network.
-   - Auto-detects Wi-Fi connection in real-time — as soon as you connect, the **Run** button unlocks.
-   - If the Wi-Fi connection drops while analyzing, the software automatically pauses and displays a warning dialog.
+### 1. Selection Window (Launcher)
+When launched (`python main.py`), a modern dark-themed selection dashboard lets you choose your desired tool:
+* **Launch Real-Time Analyzer**: Opens Window 1 for continuous, passive, non-intrusive monitoring.
+* **Launch Speed Limit Test**: Opens Window 2 for a full-throttle 20-second bandwidth capacity benchmark.
+* Easily switch between modes or return to the launcher at any time.
 
-2. **Graph 1: Real-Time Throughput Graph (1Hz Updates)**
-   - Visualizes **Download Speed (Mbps)** (Electric Cyan curve) and **Upload Speed (Mbps)** (Emerald Green curve).
-   - Dynamically sampled and redrawn at **1Hz** (exactly 1 update per second).
-   - Smooth translucent area fills below each curve for instant visual readability.
-   - Dynamic auto-scaling Y-axis with live readout legends.
+---
 
-3. **Graph 2: Real-Time Ping Latency Graph (1Hz Updates)**
-   - **Real-Time Ping (in ms)**: Measures round-trip latency to your Wi-Fi default gateway (router) or public DNS (Cloudflare `1.1.1.1` / Google `8.8.8.8`). Features an Amber curve with translucent area fill, dynamic auto-scaling, jitter calculation (RFC 1889 standard), and packet loss detection.
+### 2. Window 1: Real-Time Wi-Fi Analyzer (Passive Monitoring)
+* **Wi-Fi Connection Enforcement**: The analyzer only runs when connected to Wi-Fi. If disconnected, the **Run** button locks automatically and pauses if disconnected mid-run.
+* **Graph 1: Live Throughput (1Hz)**: Electric Cyan (Download) and Emerald Green (Upload) curves with translucent area fills.
+* **Graph 2: Real-Time Ping Latency (1Hz)**: Measures round-trip time to your router gateway or public DNS, computing RFC 1889 jitter and packet loss.
+* **Active Speed Prober (Optional)**: Checkbox to toggle lightweight 1-second burst traffic to evaluate available bandwidth without continuous saturation.
+* **Telemetry Metric Cards**: Live, Peak, and Average Download/Upload speeds, latency, and RSSI signal metrics.
+* **Mode Navigation**: Features a **← Mode Selection** button to easily switch back to the launcher window.
 
-4. **Active Speed Probing Mode (Optional)**
-   - Toggle **Active Speed Prober** to burst test traffic and benchmark your connection's maximum achievable bandwidth.
-   - Leave disabled for standard **Passive Traffic Monitoring** (monitors actual background and foreground network consumption).
+---
 
-5. **Telemetry Metric Cards**
-   - High-visibility dashboard cards displaying:
-     - **Download Speed**: Current, Peak, and Average (in Mbps)
-     - **Upload Speed**: Current, Peak, and Average (in Mbps)
-     - **Ping Latency**: Current, Min, Max, Jitter (in ms), and Packet Loss (%)
-     - **Signal RSSI**: Current RSSI (in dBm), Signal Quality (%), Channel, and Band
-
-6. **Wi-Fi Hardware & Network Details**
-   - Live strip showing SSID, BSSID (Access Point MAC), Wi-Fi Standard (e.g. `802.11ax Wi-Fi 6`, `802.11ac`), Link Transmit/Receive rates, Local IP, and Gateway IP.
-
-7. **Data Export**
-   - Export captured session data to **CSV** or **JSON** for reports, network site surveys, or speed troubleshooting.
-
-8. **Simulation Mode**
-   - Run with `--simulate` or toggle **Simulation Mode** in the UI to evaluate all features and graphs without requiring an active physical Wi-Fi connection.
+### 3. Window 2: Speed Limit Test (Active 20-Second Saturation Benchmark)
+* **20-Second Timed Benchmark**: Fixed 20-second total duration designed to measure true peak capacity without bogging down your network indefinitely.
+* **Two-Phase Saturation Sequence**:
+  * **Phase 1 (Seconds 1 to 10)**: **Multi-Threaded Download Saturation** — 8 concurrent worker streams download from high-speed CDNs to saturate downstream bandwidth.
+  * **Phase 2 (Seconds 11 to 20)**: **Multi-Threaded Upload Saturation** — 8 concurrent worker streams upload burst payloads to saturate upstream bandwidth.
+* **Separated Dedicated Graphs (10-Second Timelines)**:
+  * **Top Graph**: Real-Time Download Saturation (Mbps) plotted over a 10s timeline (`0..10s`).
+  * **Bottom Graph**: Real-Time Upload Saturation (Mbps) plotted over a 10s timeline (`0..10s`, starting from 0s at Phase 2).
+  * Both graphs use custom `ConnectedAxisItem` to guarantee axes remain seamlessly attached at `(0, 0)` with zero gap on resize and maximize.
+* **Streamlined Metric Cards**: Balanced two-card display (Download Speed & Upload Speed) mirroring the two graphs, with RSSI and progress phase widgets removed for maximum clarity.
+* **Zero 'Active Speed Prober' Checkbox**: The toolbar is focused purely on the multi-threaded saturation test.
+* **Zero Memory Accumulation**: Data packets are streamed and immediately discarded from memory buffers, keeping RAM usage below 40 MB.
+* **Mode Navigation**: Features a **← Mode Selection** button to return to the launcher window.
 
 ---
 
@@ -49,27 +50,32 @@ A native desktop application built with **Python**, **PyQt5**, and **PyQtGraph**
 realtimewifianalyzer/
 ├── wifi_analyzer/
 │   ├── __init__.py
-│   ├── wifi_monitor.py       # Queries Windows WLAN interface for SSID, RSSI, channel, link rates
-│   ├── ping_monitor.py       # Asynchronous non-blocking ping & jitter monitor
-│   ├── speed_monitor.py      # Real-time 1Hz I/O delta speed calculator (in Mbps)
-│   ├── active_probe.py       # Lightweight HTTP burst stream generator for active speed testing
-│   ├── data_buffer.py        # Circular time-series buffer and CSV/JSON exporter
+│   ├── wifi_monitor.py          # Queries Windows WLAN interface for SSID, RSSI, channel, link rates
+│   ├── ping_monitor.py          # Asynchronous non-blocking ping & jitter monitor
+│   ├── speed_monitor.py         # Real-time 1Hz I/O delta speed calculator (in Mbps)
+│   ├── active_probe.py          # Lightweight HTTP burst stream generator for active speed testing
+│   ├── speed_test_engine.py     # 20-second multi-threaded saturation benchmark engine
+│   ├── data_buffer.py           # Circular time-series buffer and CSV/JSON exporter
 │   └── ui/
 │       ├── __init__.py
-│       ├── main_window.py    # Main PyQt5 dashboard window and 1Hz loop coordinator
-│       ├── speed_graph.py    # PyQtGraph widget for Upload & Download speed (Mbps)
-│       ├── signal_graph.py   # PyQtGraph widget for Real-Time Ping Latency (ms)
-│       ├── connected_axis.py # Custom connected axis item ensuring seamless corner alignment
-│       ├── stats_card.py     # Custom telemetry metric card widgets
-│       └── styles.py         # Modern Dark Theme QSS stylesheets and color palettes
+│       ├── selection_window.py   # Mode Selection launcher window
+│       ├── main_window.py       # Window 1: Real-Time Wi-Fi Analyzer dashboard
+│       ├── speed_limit_window.py# Window 2: Speed Limit Test dashboard
+│       ├── benchmark_graph.py   # Dedicated 10s separated Download & Upload graph widgets
+│       ├── speed_graph.py       # 1Hz Real-Time Throughput graph widget
+│       ├── signal_graph.py      # 1Hz Real-Time Ping Latency graph widget
+│       ├── connected_axis.py    # Custom connected axis item ensuring seamless corner alignment
+│       ├── stats_card.py        # Telemetry metric card widgets
+│       └── styles.py            # Modern Dark Theme QSS stylesheets and color palettes
 ├── tests/
-│   ├── test_wifi_monitor.py  # Unit tests for WLAN parsing and connection state
-│   ├── test_ping_monitor.py  # Unit tests for ping latency and jitter calculations
-│   ├── test_speed_monitor.py # Unit tests for speed calculation and data buffering
-│   └── test_connected_axes.py# Unit tests for axis connection and resize resilience
-├── main.py                   # Application launch script
-├── requirements.txt          # Python dependencies
-└── README.md                 # Documentation and guide
+│   ├── test_wifi_monitor.py     # Unit tests for WLAN parsing and connection state
+│   ├── test_ping_monitor.py     # Unit tests for ping latency and jitter calculations
+│   ├── test_speed_monitor.py    # Unit tests for speed calculation and data buffering
+│   ├── test_connected_axes.py   # Unit tests for axis connection and resize resilience
+│   └── test_speed_limit.py      # Unit tests for Speed Limit Test and selection launcher
+├── main.py                      # Application launch script
+├── requirements.txt             # Python dependencies
+└── README.md                    # Documentation and guide
 ```
 
 ---
@@ -77,96 +83,79 @@ realtimewifianalyzer/
 ## 🚀 Getting Started
 
 ### 1. Prerequisites
-- **Operating System**: Windows 10 or Windows 11 (uses native `netsh wlan` and IP Helper routing).
+- **Operating System**: Windows 10 or Windows 11.
 - **Python**: Version 3.8 or higher (tested on Python 3.11).
 
 ### 2. Installation
-Open a terminal (PowerShell or Command Prompt) in the project directory and install the required dependencies:
+Open PowerShell in the project directory and install dependencies:
 
 ```powershell
 pip install -r requirements.txt
 ```
 
-The required dependencies are:
+Required dependencies:
 - `PyQt5`: Desktop GUI application framework.
-- `pyqtgraph`: Fast, hardware-accelerated 2D real-time plotting library.
+- `pyqtgraph`: Hardware-accelerated 2D real-time plotting.
 - `psutil`: High-precision system network interface I/O monitoring.
-- `numpy`: Fast vectorized numerical arrays for time-series buffer handling.
+- `numpy`: Vectorized numerical arrays for time-series buffer handling.
 
-### 3. Running the Analyzer
+### 3. Running the Suite
 
-To start the analyzer:
-
+**Standard Launch (Opens Selection Window)**:
 ```powershell
 python main.py
 ```
 
-If you are developing or testing in an environment without physical Wi-Fi hardware:
-
+**Simulation Mode (For offline testing or environments without Wi-Fi)**:
 ```powershell
 python main.py --simulate
 ```
 
----
+**Direct Mode Shortcuts**:
+```powershell
+# Directly launch Window 1 (Real-Time Wi-Fi Analyzer)
+python main.py --analyzer
 
-## 🎮 How to Use
-
-1. **Check Connection Status**:
-   - Look at the top-right banner.
-   - If you are connected to Wi-Fi, it will show a **green badge** with your Wi-Fi SSID and channel.
-   - If not connected, it will show a **red badge** stating `Disconnected from Wi-Fi — Connect to Wi-Fi to Run`, and the **Run** button will remain locked.
-
-2. **Start Analysis**:
-   - Click the green **▶ Run Analyzer** button.
-   - The button will toggle to **⏸ Pause** and the analyzer will begin updating both graphs and metric cards at **1Hz**.
-
-3. **Select Ping Destination**:
-   - Use the **Ping Target** dropdown:
-     - `Wi-Fi Gateway (Router)`: Pings your local router IP (e.g. `192.168.1.1` or `192.168.100.1`), measuring pure over-the-air Wi-Fi latency.
-     - `Cloudflare (1.1.1.1)` or `Google DNS (8.8.8.8)`: Measures end-to-end internet latency.
-
-4. **Enable Active Speed Test (Optional)**:
-   - Check the **Active Speed Prober** checkbox to burst test streams every second and observe the maximum bandwidth capacity of your Wi-Fi link.
-   - Uncheck it to return to passive monitoring mode.
-
-5. **Adjust Time Window**:
-   - Change the **Window** dropdown (`30 seconds`, `60 seconds`, `120 seconds`, `300 seconds`) to zoom in on recent spikes or observe broader trends.
-
-6. **Export Data**:
-   - Click **📥 Export Data** to save the recorded telemetry session as a `.csv` or `.json` file.
+# Directly launch Window 2 (Speed Limit Test)
+python main.py --speed-test
+```
 
 ---
 
-## ⚡ Active Speed Prober vs. Passive Traffic Monitoring
+## 🎮 How to Use the Modes
 
-The **Active Speed Prober** checkbox in the toolbar controls *how* your upload and download speeds are evaluated on the real-time throughput graph:
+### Using Window 1: Real-Time Wi-Fi Analyzer
+1. Click **Launch Real-Time Analyzer →** in the selection window.
+2. Confirm the top-right Wi-Fi connection badge is **green**.
+3. Click **▶ Run** to monitor live network throughput and router ping latency updated at **1Hz**.
+4. Select your preferred **Ping Target** (`Router Gateway`, `Cloudflare`, `Google DNS`).
+5. (Optional) Check **Active Speed Prober** to burst 1s test traffic to assess pipeline responsiveness.
+6. Export captured sessions anytime via **📥 Export Data**.
+7. Click **← Mode Selection** anytime to return to the launcher window.
 
-### 1. Unchecked (Default: Passive Traffic Monitoring)
-* **How it works**: The software passively observes your active Wi-Fi network interface using `psutil`. It calculates the exact amount of data currently passing through the Wi-Fi card per second.
-* **Expected graph output**:
-  * If you are streaming high-definition video, playing an online game, or downloading files, the graph reflects your real current consumption (e.g., 20–100+ Mbps).
-  * If your computer is sitting idle without web activity, the graph will naturally hover around **0.0–0.5 Mbps** (small background system telemetry and keep-alive packets).
-* **Network impact**: Zero extra data consumed (0 bytes overhead).
+### Using Window 2: Speed Limit Test
+1. Click **Launch Speed Limit Test →** in the selection window.
+2. Click **▶ Run Speed Test**.
+3. **Phase 1 (Seconds 1–10)**: The software launches 8 parallel download streams to saturate downstream bandwidth. Watch the top **Download Speed (Mbps)** graph plot real-time capacity.
+4. **Phase 2 (Seconds 11–20)**: The software switches to 8 parallel upload streams. Watch the bottom **Upload Speed (Mbps)** graph plot real-time upload capacity.
+5. **Results**: At second 20, the test finishes automatically and presents your **Peak Download** and **Peak Upload** achievable bandwidth.
+6. Click **📁 Export Results** to save the benchmark to CSV or JSON.
+7. Click **← Mode Selection** to return to the launcher window.
 
-### 2. Checked (Active Speed Prober Mode)
-* **How it works**: A dedicated background worker thread generates lightweight, continuous 1-second burst traffic (downloading small stream chunks from fast CDN test endpoints like Cloudflare and uploading small burst packets).
-* **Expected graph output**:
-  * The graph measures and displays your **maximum available throughput capacity** live at 1Hz, even when you aren't doing any browsing or file downloading.
-  * You can walk around your room or office and watch how physical obstacles, walls, and distance dynamically affect your available Wi-Fi link speed in real-time.
-* **Network impact**: Consumes small bursts of test data (~1–2 MB per second while active).
+---
 
-### Summary Comparison
+## 💡 Active Speed Prober vs. Speed Limit Test Explained
 
-| Mode | When to Use | Data Usage | Graph Representation |
-| :--- | :--- | :--- | :--- |
-| **Passive Monitoring** *(Unchecked)* | To observe actual ongoing background and application network traffic. | None (0 extra bytes) | Actual live bandwidth consumption. |
-| **Active Speed Prober** *(Checked)* | To benchmark and diagnose the maximum speed your Wi-Fi link can currently achieve. | Minimal test bursts (~1–2 MB/s) | Maximum achievable Wi-Fi capacity. |
+### Why Does Passive Monitoring Show 10–20 Mbps While Speed Tests Show 60–100+ Mbps?
+* **Passive Throughput Monitoring (Window 1 default)**: Measures the actual network packets currently consumed by your active applications and operating system. If background programs and browsers only need 10–20 Mbps, that is what is measured. This does not mean your Wi-Fi cannot go faster—it simply means current demand is modest.
+* **Active Speed Prober (Window 1 optional toggle)**: Generates small 1-second burst requests every second. This evaluates instantaneous link responsiveness without completely monopolizing your bandwidth.
+* **Speed Limit Test (Window 2)**: Runs 8 concurrent worker streams designed to max out your downstream (Phase 1, 1–10s) and upstream (Phase 2, 11–20s) bandwidth. Like mobile and web speed test apps, this measures your connection's absolute physical ceiling. Chunks are discarded immediately upon arrival, maintaining RAM usage below 40 MB and low CPU load.
 
 ---
 
 ## 🧪 Running Unit Tests
 
-Run the complete test suite:
+Run the full test suite (29 tests):
 
 ```powershell
 python -m unittest discover tests
@@ -174,16 +163,17 @@ python -m unittest discover tests
 
 ---
 
-## ⚙️ Technical Architecture Details
+## ⚙️ Technical Comparison
 
-| Metric | Source / Method | Unit | Description |
-| :--- | :--- | :--- | :--- |
-| **Download Speed** | `psutil.net_io_counters(pernic=True)` | `Mbps` | Sampled every 1.0 second: `(delta_bytes_recv * 8) / (dt * 1_000_000)` |
-| **Upload Speed** | `psutil.net_io_counters(pernic=True)` | `Mbps` | Sampled every 1.0 second: `(delta_bytes_sent * 8) / (dt * 1_000_000)` |
-| **Ping Latency** | Non-blocking background worker (`ping -n 1 -w 800 <host>`) | `ms` | Round-trip time to access point gateway or DNS |
-| **Jitter** | RFC 1889 / RFC 3550 statistical variance | `ms` | Running jitter smoothed over successive ping measurements |
-| **RSSI** | `netsh wlan show interfaces` | `dBm` / `dB` | Exact signal strength reported by Windows WLAN API |
-| **Signal Quality** | Windows Native WLAN | `%` | Percentage signal quality (0% to 100%) |
+| Feature | Real-Time Wi-Fi Analyzer (Window 1) | Speed Limit Test (Window 2) |
+| :--- | :--- | :--- |
+| **Measurement Type** | **Passive 1Hz I/O Monitoring** | **Active Multi-Threaded Saturation** |
+| **Primary Purpose** | Monitor current app/OS consumption & latency | Measure theoretical ceiling & peak bandwidth |
+| **Test Duration** | Continuous (until paused by user) | Fixed 20 seconds (10s DL + 10s UL) |
+| **Throughput Graphs** | Combined Download & Upload graph | **Separated** Download (Top) & Upload (Bottom) graphs |
+| **Ping Latency** | Yes (real-time ping & jitter graph) | No (replaced by Upload graph) |
+| **RSSI Section** | Yes (Signal dBm and quality) | Removed for clean benchmark layout |
+| **Network Overhead** | 0 bytes (pure passive observation) | 20-second active burst |
 
 ---
 

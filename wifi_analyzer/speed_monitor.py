@@ -142,9 +142,9 @@ class SpeedMonitor:
         if delta_sent < 0:
             delta_sent = 0
 
-        # Convert Bytes/s to Megabits/s: (Bytes * 8) / (1_000_000 * dt)
-        download_mbps = (delta_recv * 8.0) / (dt * 1_000_000.0)
-        upload_mbps = (delta_sent * 8.0) / (dt * 1_000_000.0)
+        # Convert Bytes/s to Megabits/s (Mbps)
+        download_mbps = (delta_recv * 8.0) / (dt * 1e6)
+        upload_mbps = (delta_sent * 8.0) / (dt * 1e6)
 
         # Update running stats
         self._last_time = now
@@ -198,8 +198,8 @@ class SpeedMonitor:
         """Returns statistical summary of speeds and data volume."""
         avg_dl = (self._sum_download_mbps / self._samples_count) if self._samples_count > 0 else 0.0
         avg_ul = (self._sum_upload_mbps / self._samples_count) if self._samples_count > 0 else 0.0
-        total_dl_mb = (self.total_bytes_recv / 1_000_000.0)
-        total_ul_mb = (self.total_bytes_sent / 1_000_000.0)
+        total_dl_mb = (self.total_bytes_recv / 1e6)
+        total_ul_mb = (self.total_bytes_sent / 1e6)
 
         return {
             "peak_download_mbps": round(self.peak_download_mbps, 2),

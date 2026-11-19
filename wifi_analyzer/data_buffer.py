@@ -153,3 +153,11 @@ class DataBuffer:
         points = [asdict(p) for p in self._points]
         with open(filepath, 'w', encoding='utf-8') as f:
             json.dump(points, f, indent=2)
+
+    def clear(self):
+        """Alias for reset."""
+        self.reset()
+
+
+# Convenient alias
+DataPoint = TelemetryPoint

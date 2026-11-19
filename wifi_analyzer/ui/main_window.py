@@ -48,9 +48,10 @@ class MainWindow(QMainWindow):
     Enforces Wi-Fi connection requirement before allowing analysis.
     """
 
-    def __init__(self, simulate: bool = False):
-        super().__init__()
+    def __init__(self, simulate: bool = False, parent=None, on_back_callback=None):
+        super().__init__(parent)
         self.simulate = simulate
+        self.on_back_callback = on_back_callback
         self.is_running = False
         self.start_timestamp: Optional[float] = None
         self.selected_window_seconds: int = 60
@@ -219,6 +220,15 @@ class MainWindow(QMainWindow):
         self.btn_export.setToolTip("Export captured session data to CSV or JSON")
         self.btn_export.clicked.connect(self._export_data)
 
+        # Mode Selection Button
+        self.btn_back = QPushButton("←  Mode Selection")
+        self.btn_back.setStyleSheet(
+            "QPushButton { background-color: #1e293b; color: #94a3b8; border: 1px solid #334155; "
+            "border-radius: 6px; font-weight: 600; padding: 6px 14px; } "
+            "QPushButton:hover { background-color: #334155; color: #f8fafc; }"
+        )
+        self.btn_back.clicked.connect(self._go_back_to_selection)
+
         layout.addWidget(self.btn_run)
         layout.addWidget(self.btn_stop)
         layout.addWidget(self.btn_reset)
@@ -232,6 +242,7 @@ class MainWindow(QMainWindow):
         layout.addWidget(self.chk_simulate)
         layout.addStretch()
         layout.addWidget(self.btn_export)
+        layout.addWidget(self.btn_back)
 
         return frame
 
@@ -443,6 +454,14 @@ class MainWindow(QMainWindow):
         self.card_rssi.update_metric("--", sub_text="Quality: --% | Ch: --")
 
         self.status_bar.showMessage("Analyzer reset. Ready.")
+
+    def _go_back_to_selection(self):
+        """Returns to the Mode Selection window."""
+        self._stop_analyzer()
+        if self.on_back_callback:
+            self.on_back_callback()
+        else:
+            self.close()
 
     # =========================================================================
     # 1Hz Real-Time Updater (Main Analysis Loop)

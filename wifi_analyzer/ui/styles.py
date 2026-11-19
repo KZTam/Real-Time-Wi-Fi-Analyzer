@@ -193,4 +193,48 @@ QStatusBar {{
     color: {PALETTE['text_secondary']};
     border-top: 1px solid {PALETTE['border']};
 }}
+
+/* Dialogs & Message Boxes */
+QDialog, QMessageBox {{
+    background-color: {PALETTE['bg_panel']};
+    color: {PALETTE['text_primary']};
+}}
+
+QMessageBox QLabel {{
+    color: #f8fafc;
+    background-color: transparent;
+    font-size: 13px;
+}}
+
+QMessageBox QLabel#qt_msgbox_label {{
+    color: #f8fafc;
+}}
+
+QMessageBox QLabel#qt_msgboxex_icon_label {{
+    background-color: transparent;
+}}
+
+QMessageBox QPushButton {{
+    background-color: #263248;
+    color: #ffffff;
+    border: 1px solid {PALETTE['border_highlight']};
+    border-radius: 6px;
+    padding: 7px 22px;
+    min-width: 75px;
+    font-weight: 600;
+    font-size: 13px;
+}}
+
+QMessageBox QPushButton:hover {{
+    background-color: #334155;
+    border-color: #64748b;
+}}
+
+QMessageBox QPushButton:pressed {{
+    background-color: #1e293b;
+}}
+
+QMessageBox QPushButton:focus {{
+    border-color: #38bdf8;
+}}
 """
